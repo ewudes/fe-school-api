@@ -1,0 +1,22 @@
+{
+  "name": "building-api-with-node",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ewudes/building-api-with-node.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ewudes/building-api-with-node/issues"
+  },
+  "homepage": "https://github.com/ewudes/building-api-with-node#readme",
+  "dependencies": {
+    "express": "^4.17.3"
+  }
+}
