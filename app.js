@@ -1,11 +1,12 @@
 const express = require("express");
-const MongoClient = require("mongodb").MongoClient;
+const { MongoClient, ServerApiVersion } = require('mongodb');
 const objectId = require("mongodb").ObjectId;
+require('dotenv').config();
     
 const app = express();
 const jsonParser = express.json();
-  
-const mongoClient = new MongoClient("mongodb://localhost:27017/");
+
+const mongoClient = new MongoClient(process.env.MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
  
 app.use(express.static(__dirname + "/public"));
  
