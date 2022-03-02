@@ -15,7 +15,7 @@ app.use(express.static(__dirname + "/public"));
      try {
         await mongoClient.connect();
         app.locals.collection = mongoClient.db("usersdb").collection("users");
-        await app.listen(3000);
+        await app.listen(process.env.PORT || 3000);
         console.log("Сервер ожидает подключения...");
     }catch(err) {
         return console.log(err);
