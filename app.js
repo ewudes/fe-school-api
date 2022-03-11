@@ -14,78 +14,80 @@ app.use(express.static(__dirname + "/public"));
 (async () => {
      try {
         await mongoClient.connect();
-        app.locals.collection = mongoClient.db("usersdb").collection("users");
+        app.locals.collection = mongoClient.db("eventDatabase").collection("events");
         await app.listen(process.env.PORT || 3000);
-        console.log("Сервер ожидает подключения...");
+        console.log("Сервер ожидает...");
     }catch(err) {
         return console.log(err);
     } 
 })();
  
  
-app.get("/api/users", async(req, res) => {
+app.get("/api/events", async(req, res) => {
          
     const collection = req.app.locals.collection;
     try{
-        const users = await collection.find({}).toArray();
-        res.send(users);
+        const events = await collection.find({}).toArray();
+        res.send(events);
     }
     catch(err){return console.log(err);}
       
 });
-app.get("/api/users/:id", async(req, res) => {
+app.get("/api/events/:id", async(req, res) => {
          
     const id = new objectId(req.params.id);
     const collection = req.app.locals.collection;
     try{
-        const user = await collection.findOne({_id: id});
-        res.send(user);
+        const event = await collection.findOne({_id: id});
+        res.send(event);
     }
     catch(err){return console.log(err);}
 });
     
-app.post("/api/users", jsonParser, async(req, res)=> {
+app.post("/api/events", jsonParser, async(req, res)=> {
         
     if(!req.body) return res.sendStatus(400);
         
-    const userName = req.body.name;
-    const userAge = req.body.age;
-    let user = {name: userName, age: userAge};
+    const eventTheme = req.body.theme;
+    const eventComment = req.body.comment;
+    const eventDate = req.body.date;
+    let event = {theme: eventTheme, comment: eventComment, date: eventDate};
         
     const collection = req.app.locals.collection;
      
     try{
-        await collection.insertOne(user);
-        res.send(user);
+        await collection.insertOne(event);
+        res.send(event);
     }
     catch(err){return console.log(err);}
 });
      
-app.delete("/api/users/:id", async(req, res)=>{
+app.delete("/api/events/:id", async(req, res)=>{
          
     const id = new objectId(req.params.id);
     const collection = req.app.locals.collection;
     try{
         const result = await collection.findOneAndDelete({_id: id});
-        const user = result.value;
-        res.send(user);
+        const event = result.value;
+        res.send(event);
     }
     catch(err){return console.log(err);}
 });
     
-app.put("/api/users", jsonParser, async(req, res)=>{
+app.put("/api/events", jsonParser, async(req, res)=>{
          
     if(!req.body) return res.sendStatus(400);
     const id = new objectId(req.body.id);
-    const userName = req.body.name;
-    const userAge = req.body.age;
+    const eventTheme = req.body.theme;
+    const eventComment = req.body.comment;
+    const eventDate = req.body.date;
         
     const collection = req.app.locals.collection;
     try{
-        const result = await collection.findOneAndUpdate({_id: id}, { $set: {age: userAge, name: userName}},
+        const result = await collection.findOneAndUpdate({_id: id}, { $set: {date: eventDate, comment: eventComment, theme: eventTheme}},
          {returnDocument: "after" });
-        const user = result.value;
-        res.send(user);
+        const event = result.value;
+        res.send(event);
     }
     catch(err){return console.log(err);}
 });

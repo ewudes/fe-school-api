@@ -3,20 +3,37 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>Список пользователей</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        .event-form {
+            padding: 20px;
+        }
+
+        .table {
+            width: 96%;
+            margin: auto;
+        }
+
+        .panel-body {
+            padding: 0;
+        }
+
+    </style>
 </head>
 <body>
-    <h2>Список пользователей</h2>
-    <form name="userForm">
+    <form name="eventForm" class="event-form">
         <input type="hidden" name="id" value="0" />
         <div class="form-group">
-            <label for="name">Имя:</label>
-            <input class="form-control" name="name" />
+            <label for="theme">Тема:</label>
+            <input class="form-control" name="theme" />
         </div>
         <div class="form-group">
-            <label for="age">Возраст:</label>
-            <input class="form-control" name="age" />
+            <label for="comment">Комментарий:</label>
+            <input class="form-control" name="comment" />
+        </div>
+        <div class="form-group">
+            <label for="date">Дата:</label>
+            <input class="form-control" name="date" />
         </div>
         <div class="panel-body">
             <button type="submit" class="btn btn-sm btn-primary">Сохранить</button>
@@ -24,135 +41,141 @@
         </div>
     </form>
     <table class="table table-condensed table-striped table-bordered">
-        <thead><tr><th>Id</th><th>Имя</th><th>возраст</th><th></th></tr></thead>
+        <thead><tr><th>Id</th><th>Тема</th><th>Комментарий</th><th>Дата</th><th></th></tr></thead>
         <tbody>
         </tbody>
     </table>
    
     <script>
-    // Получение всех пользователей
-        async function GetUsers() {
+    // Получение всех событий
+        async function GetEvents() {
             // отправляет запрос и получаем ответ
-            const response = await fetch("/api/users", {
+            const response = await fetch("/api/events", {
                 method: "GET",
                 headers: { "Accept": "application/json" }
             });
             // если запрос прошел нормально
             if (response.ok === true) {
                 // получаем данные
-                const users = await response.json();
+                const events = await response.json();
                 let rows = document.querySelector("tbody"); 
-                users.forEach(user => {
+                events.forEach(event => {
                     // добавляем полученные элементы в таблицу
-                    rows.append(row(user));
+                    rows.append(row(event));
                 });
             }
         }
-        // Получение одного пользователя
-        async function GetUser(id) {
-            const response = await fetch("/api/users/" + id, {
+        // Получение одного события
+        async function GetEvemts(id) {
+            const response = await fetch("/api/events/" + id, {
                 method: "GET",
                 headers: { "Accept": "application/json" }
             });
             if (response.ok === true) {
-                const user = await response.json();
-                const form = document.forms["userForm"];
-                form.elements["id"].value = user._id;
-                form.elements["name"].value = user.name;
-                form.elements["age"].value = user.age;
+                const event = await response.json();
+                const form = document.forms["eventForm"];
+                form.elements["id"].value = event._id;
+                form.elements["theme"].value = event.theme;
+                form.elements["comment"].value = event.comment;
             }
         }
-        // Добавление пользователя
-        async function CreateUser(userName, userAge) {
+        // Добавление события
+        async function CreateEvent(eventTheme, eventComment, eventDate) {
   
-            const response = await fetch("api/users", {
+            const response = await fetch("api/events", {
                 method: "POST",
                 headers: { "Accept": "application/json", "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    name: userName,
-                    age: parseInt(userAge, 10)
+                    theme: eventTheme,
+                    comment: eventComment,
+                    date: eventDate
                 })
             });
             if (response.ok === true) {
-                const user = await response.json();
+                const event = await response.json();
                 reset();
-                document.querySelector("tbody").append(row(user));
+                document.querySelector("tbody").append(row(event));
             }
         }
-        // Изменение пользователя
-        async function EditUser(userId, userName, userAge) {
-            const response = await fetch("api/users", {
+        // Изменение события
+        async function EditEvent(eventId, eventTheme, eventComment, eventDate) {
+            const response = await fetch("api/events", {
                 method: "PUT",
                 headers: { "Accept": "application/json", "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    id: userId,
-                    name: userName,
-                    age: parseInt(userAge, 10)
+                    id: eventId,
+                    theme: eventTheme,
+                    comment: eventComment,
+                    date: eventDate,
                 })
             });
             if (response.ok === true) {
-                const user = await response.json();
+                const event = await response.json();
                 reset();
-                document.querySelector("tr[data-rowid='" + user._id + "']").replaceWith(row(user));
+                document.querySelector("tr[data-rowid='" + event._id + "']").replaceWith(row(event));
             }
         }
-        // Удаление пользователя
-        async function DeleteUser(id) {
-            const response = await fetch("/api/users/" + id, {
+        // Удаление события
+        async function DeleteEvent(id) {
+            const response = await fetch("/api/events/" + id, {
                 method: "DELETE",
                 headers: { "Accept": "application/json" }
             });
             if (response.ok === true) {
-                const user = await response.json();
-                document.querySelector("tr[data-rowid='" + user._id + "']").remove();
+                const event = await response.json();
+                document.querySelector("tr[data-rowid='" + event._id + "']").remove();
             }
         }
   
         // сброс формы
         function reset() {
-            const form = document.forms["userForm"];
+            const form = document.forms["eventForm"];
             form.reset();
             form.elements["id"].value = 0;
         }
         // создание строки для таблицы
-        function row(user) {
+        function row(event) {
   
             const tr = document.createElement("tr");
-            tr.setAttribute("data-rowid", user._id);
+            tr.setAttribute("data-rowid", event._id);
   
             const idTd = document.createElement("td");
-            idTd.append(user._id);
+            idTd.append(event._id);
             tr.append(idTd);
   
-            const nameTd = document.createElement("td");
-            nameTd.append(user.name);
-            tr.append(nameTd);
+            const themeTd = document.createElement("td");
+            themeTd.append(event.theme);
+            tr.append(themeTd);
   
-            const ageTd = document.createElement("td");
-            ageTd.append(user.age);
-            tr.append(ageTd);
+            const commentTd = document.createElement("td");
+            commentTd.append(event.comment);
+            tr.append(commentTd);
+
+            const dateTd = document.createElement("td");
+            dateTd.append(event.date);
+            tr.append(dateTd);
               
             const linksTd = document.createElement("td");
   
             const editLink = document.createElement("a");
-            editLink.setAttribute("data-id", user._id);
+            editLink.setAttribute("data-id", event._id);
             editLink.setAttribute("style", "cursor:pointer;padding:15px;");
             editLink.append("Изменить");
             editLink.addEventListener("click", e => {
   
                 e.preventDefault();
-                GetUser(user._id);
+                GetEvent(event._id);
             });
             linksTd.append(editLink);
   
             const removeLink = document.createElement("a");
-            removeLink.setAttribute("data-id", user._id);
+            removeLink.setAttribute("data-id", event._id);
             removeLink.setAttribute("style", "cursor:pointer;padding:15px;");
             removeLink.append("Удалить");
             removeLink.addEventListener("click", e => {
   
                 e.preventDefault();
-                DeleteUser(user._id);
+                DeleteEvent(event._id);
             });
   
             linksTd.append(removeLink);
@@ -168,20 +191,21 @@
         })
   
         // отправка формы
-        document.forms["userForm"].addEventListener("submit", e => {
+        document.forms["eventForm"].addEventListener("submit", e => {
             e.preventDefault();
-            const form = document.forms["userForm"];
+            const form = document.forms["eventForm"];
             const id = form.elements["id"].value;
-            const name = form.elements["name"].value;
-            const age = form.elements["age"].value;
+            const theme = form.elements["theme"].value;
+            const comment = form.elements["comment"].value;
+            const date = form.elements["date"].value || new Date();
             if (id == 0)
-                CreateUser(name, age);
+                CreateEvent(theme, comment, date);
             else
-                EditUser(id, name, age);
+                EditEvent(id, theme, comment, date);
         });
   
-        // загрузка пользователей
-        GetUsers();
+        // загрузка событий
+        GetEvents();
     </script>
 </body>
 </html>
