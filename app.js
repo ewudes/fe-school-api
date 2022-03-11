@@ -16,7 +16,7 @@ app.use(express.static(__dirname + "/public"));
         await mongoClient.connect();
         app.locals.collection = mongoClient.db("eventDatabase").collection("events");
         await app.listen(process.env.PORT || 3000);
-        console.log("Сервер ожидает...");
+        console.log("Server waiting...");
     }catch(err) {
         return console.log(err);
     } 
@@ -92,10 +92,10 @@ app.put("/api/events", jsonParser, async(req, res)=>{
     catch(err){return console.log(err);}
 });
   
-// прослушиваем прерывание работы программы (ctrl-c)
+// Listen for program interruption (ctrl-c)
 process.on("SIGINT", async() => {
      
     await mongoClient.close();
-    console.log("Приложение завершило работу");
+    console.log("The application has completed its work");
     process.exit();
 });
