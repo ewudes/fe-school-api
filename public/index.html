@@ -78,6 +78,7 @@
                 form.elements["id"].value = event._id;
                 form.elements["theme"].value = event.theme;
                 form.elements["comment"].value = event.comment;
+                form.elements["date"].value = event.date;
             }
         }
         // Creating an event
@@ -107,7 +108,7 @@
                     id: eventId,
                     theme: eventTheme,
                     comment: eventComment,
-                    date: eventDate,
+                    date: eventDate
                 })
             });
             if (response.ok === true) {
@@ -161,7 +162,7 @@
             const editLink = document.createElement("a");
             editLink.setAttribute("data-id", event._id);
             editLink.setAttribute("style", "cursor:pointer;padding:15px;");
-            editLink.append("Изменить");
+            editLink.append("Change");
             editLink.addEventListener("click", e => {
   
                 e.preventDefault();
@@ -171,8 +172,8 @@
   
             const removeLink = document.createElement("a");
             removeLink.setAttribute("data-id", event._id);
-            removeLink.setAttribute("style", "cursor:pointer;padding:15px;");
-            removeLink.append("Удалить");
+            removeLink.setAttribute("style", "cursor:pointer;padding:15px;color:#FF0000");
+            removeLink.append("Delete");
             removeLink.addEventListener("click", e => {
   
                 e.preventDefault();
