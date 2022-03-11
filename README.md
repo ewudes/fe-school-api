@@ -1,12 +1,12 @@
 <!-- ![image](https://pyheroku-badge.herokuapp.com/?app=fe-school-api&path=https://fe-school-api.herokuapp.com&style=flat") -->
 
-## GET ##
-`https://fe-school-api.herokuapp.com/api/events`
-## GET ##
-`https://fe-school-api.herokuapp.com/api/events/:id`
-## POST ##
-`https://fe-school-api.herokuapp.com/api/events/`
-<details><summary>Схема</summary>
+## Get all events ##
+**GET** `https://fe-school-api.herokuapp.com/api/events`
+## Get one event ##
+**GET** `https://fe-school-api.herokuapp.com/api/events/:id`
+## Create an event ##
+**POST** `https://fe-school-api.herokuapp.com/api/events/`
+<details><summary>Scheme</summary>
 
 ```json
     {
@@ -18,12 +18,12 @@
 
 </details>
 
-## DELETE ##
-`https://fe-school-api.herokuapp.com/api/events/:id`
+## Delete event ##
+**DELETE** `https://fe-school-api.herokuapp.com/api/events/:id`
 
-## PUT ##
-`https://fe-school-api.herokuapp.com/api/events/`
-<details><summary>Схема</summary>
+## Change an existing event ##
+**PUT** `https://fe-school-api.herokuapp.com/api/events/`
+<details><summary>Scheme</summary>
 
 ```json
     {
