@@ -67,7 +67,7 @@
             }
         }
         // Get one event
-        async function GetEvents(id) {
+        async function GetEvent(id) {
             const response = await fetch("/api/events/" + id, {
                 method: "GET",
                 headers: { "Accept": "application/json" }
