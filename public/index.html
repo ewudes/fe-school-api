@@ -25,48 +25,48 @@
     <form name="eventForm" class="event-form">
         <input type="hidden" name="id" value="0" />
         <div class="form-group">
-            <label for="theme">Тема:</label>
+            <label for="theme">Theme:</label>
             <input class="form-control" name="theme" />
         </div>
         <div class="form-group">
-            <label for="comment">Комментарий:</label>
+            <label for="comment">Comment:</label>
             <input class="form-control" name="comment" />
         </div>
         <div class="form-group">
-            <label for="date">Дата:</label>
+            <label for="date">Date:</label>
             <input class="form-control" name="date" />
         </div>
         <div class="panel-body">
-            <button type="submit" class="btn btn-sm btn-primary">Сохранить</button>
-            <a id="reset" class="btn btn-sm btn-primary">Сбросить</a>
+            <button type="submit" class="btn btn-sm btn-primary">Save</button>
+            <a id="reset" class="btn btn-sm btn-primary">Reset</a>
         </div>
     </form>
     <table class="table table-condensed table-striped table-bordered">
-        <thead><tr><th>Id</th><th>Тема</th><th>Комментарий</th><th>Дата</th><th></th></tr></thead>
+        <thead><tr><th>Id</th><th>Theme</th><th>Comment</th><th>Date</th><th></th></tr></thead>
         <tbody>
         </tbody>
     </table>
    
     <script>
-    // Получение всех событий
+    // Getting all the events
         async function GetEvents() {
-            // отправляет запрос и получаем ответ
+            // Send a request and get an answer
             const response = await fetch("/api/events", {
                 method: "GET",
                 headers: { "Accept": "application/json" }
             });
-            // если запрос прошел нормально
+            // If the request was sent normally
             if (response.ok === true) {
-                // получаем данные
+                // Receiving data
                 const events = await response.json();
                 let rows = document.querySelector("tbody"); 
                 events.forEach(event => {
-                    // добавляем полученные элементы в таблицу
+                    // Add these elements to the table
                     rows.append(row(event));
                 });
             }
         }
-        // Получение одного события
+        // Get one event
         async function GetEvents(id) {
             const response = await fetch("/api/events/" + id, {
                 method: "GET",
@@ -80,7 +80,7 @@
                 form.elements["comment"].value = event.comment;
             }
         }
-        // Добавление события
+        // Creating an event
         async function CreateEvent(eventTheme, eventComment, eventDate) {
   
             const response = await fetch("api/events", {
@@ -98,7 +98,7 @@
                 document.querySelector("tbody").append(row(event));
             }
         }
-        // Изменение события
+        // Changing the event
         async function EditEvent(eventId, eventTheme, eventComment, eventDate) {
             const response = await fetch("api/events", {
                 method: "PUT",
@@ -116,7 +116,7 @@
                 document.querySelector("tr[data-rowid='" + event._id + "']").replaceWith(row(event));
             }
         }
-        // Удаление события
+        // Deleting an event
         async function DeleteEvent(id) {
             const response = await fetch("/api/events/" + id, {
                 method: "DELETE",
@@ -128,13 +128,13 @@
             }
         }
   
-        // сброс формы
+        // Reset form
         function reset() {
             const form = document.forms["eventForm"];
             form.reset();
             form.elements["id"].value = 0;
         }
-        // создание строки для таблицы
+        // Creating a row for a table
         function row(event) {
   
             const tr = document.createElement("tr");
@@ -184,14 +184,14 @@
   
             return tr;
         }
-        // сброс значений формы
+        // Reset form values
         document.getElementById("reset").click(function (e) {
   
             e.preventDefault();
             reset();
         })
   
-        // отправка формы
+        // Sending the form
         document.forms["eventForm"].addEventListener("submit", e => {
             e.preventDefault();
             const form = document.forms["eventForm"];
@@ -205,7 +205,7 @@
                 EditEvent(id, theme, comment, date);
         });
   
-        // загрузка событий
+        // Loading events
         GetEvents();
     </script>
 </body>
