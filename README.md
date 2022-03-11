@@ -10,9 +10,9 @@
 
 ```json
     {
-        "theme": string,
-        "comment": string,
-        "date": string
+        "theme": "string",
+        "comment": "string",
+        "date": "string"
     }
 ```
 
@@ -27,10 +27,10 @@
 
 ```json
     {
-        "id": string,
-        "theme": string,
-        "comment": string,
-        "date": string
+        "id": "string",
+        "theme": "string",
+        "comment": "string",
+        "date": "string"
     }
 ```
 
