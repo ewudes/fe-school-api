@@ -1,5 +1,5 @@
 {
-  "name": "dd-node-api",
+  "name": "fe-school-api",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ewudes/dd-node-api.git"
+    "url": "git+https://github.com/ewudes/fe-school-api.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/ewudes/dd-node-api/issues"
+    "url": "https://github.com/ewudes/fe-school-api/issues"
   },
-  "homepage": "https://github.com/ewudes/dd-node-api#readme",
+  "homepage": "https://github.com/ewudes/fe-school-api#readme",
   "dependencies": {
     "body-parser": "^1.19.2",
     "dotenv": "^16.0.0",
