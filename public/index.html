@@ -9,18 +9,23 @@
         .event-form {
             padding: 20px;
         }
-
         .table {
             width: 96%;
             margin: auto;
         }
-
         .panel-body {
             padding: 0;
         }
-
         .form-control__date {
             width: 200px;
+        }
+        .form-control__checkbox {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+        }
+        .form-label__checkbox {
+            vertical-align: top;
         }
 
     </style>
@@ -40,13 +45,21 @@
             <label for="date">Date:</label>
             <input type="datetime-local" class="form-control form-control__date" name="date" />
         </div>
+        <div class="form-group">
+            <label for="favorite" class="form-label__checkbox">Favorite</label>
+            <input type="checkbox" class="form-control form-control__checkbox" name="favorite" />
+        </div>
+        <div class="form-group">
+            <label for="archive" class="form-label__checkbox">Archive</label>
+            <input type="checkbox" class="form-control form-control__checkbox" name="archive" />
+        </div>
         <div class="panel-body">
             <button type="submit" class="btn btn-sm btn-primary">Save</button>
             <a id="reset" class="btn btn-sm btn-primary">Reset</a>
         </div>
     </form>
     <table class="table table-condensed table-striped table-bordered">
-        <thead><tr><th>Id</th><th>Theme</th><th>Comment</th><th>Date</th><th></th></tr></thead>
+        <thead><tr><th>Id</th><th>Theme</th><th>Comment</th><th>Date</th><th>F</th><th>A</th><th></th></tr></thead>
         <tbody>
         </tbody>
     </table>
@@ -83,11 +96,13 @@
                 form.elements["theme"].value = event.theme;
                 form.elements["comment"].value = event.comment;
                 form.elements["date"].value = event.date;
+                form.elements["favorite"].checked = event.favorite;
+                form.elements["archive"].checked = event.archive;
             }
 
         }
         // Creating an event
-        async function CreateEvent(eventTheme, eventComment, eventDate) {
+        async function CreateEvent(eventTheme, eventComment, eventDate, isFavorite, isArchive) {
   
             const response = await fetch("api/events", {
                 method: "POST",
@@ -95,7 +110,9 @@
                 body: JSON.stringify({
                     theme: eventTheme,
                     comment: eventComment,
-                    date: eventDate
+                    date: eventDate,
+                    favorite: isFavorite,
+                    archive: isArchive
                 })
             });
             if (response.ok === true) {
@@ -105,7 +122,7 @@
             }
         }
         // Changing the event
-        async function EditEvent(eventId, eventTheme, eventComment, eventDate) {
+        async function EditEvent(eventId, eventTheme, eventComment, eventDate, isFavorite, isArchive) {
             const response = await fetch("api/events", {
                 method: "PUT",
                 headers: { "Accept": "application/json", "Content-Type": "application/json" },
@@ -113,7 +130,9 @@
                     id: eventId,
                     theme: eventTheme,
                     comment: eventComment,
-                    date: eventDate
+                    date: eventDate,
+                    favorite: isFavorite,
+                    archive: isArchive
                 })
             });
             if (response.ok === true) {
@@ -161,6 +180,14 @@
             const dateTd = document.createElement("td");
             dateTd.append(event.date);
             tr.append(dateTd);
+
+            const favoriteTd = document.createElement("td");
+            favoriteTd.append(event.favorite);
+            tr.append(favoriteTd);
+
+            const archiveTd = document.createElement("td");
+            archiveTd.append(event.archive);
+            tr.append(archiveTd);
               
             const linksTd = document.createElement("td");
   
@@ -205,10 +232,12 @@
             const theme = form.elements["theme"].value;
             const comment = form.elements["comment"].value;
             const date = form.elements["date"].value ? new Date(form.elements["date"].value) : new Date();
+            const favorite = form.elements["favorite"].checked;
+            const archive = form.elements["archive"].checked;
             if (id == 0)
-                CreateEvent(theme, comment, date);
+                CreateEvent(theme, comment, date, favorite, archive);
             else
-                EditEvent(id, theme, comment, date);
+                EditEvent(id, theme, comment, date, favorite, archive);
         });
   
         // Loading events
