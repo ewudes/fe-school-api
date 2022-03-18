@@ -51,7 +51,10 @@ app.post("/api/events", jsonParser, async(req, res)=> {
     const eventTheme = req.body.theme;
     const eventComment = req.body.comment;
     const eventDate = req.body.date;
-    let event = {theme: eventTheme, comment: eventComment, date: eventDate};
+    const isFavorite = req.body.favorite;
+    const isArchive = req.body.archive;
+
+    let event = {theme: eventTheme, comment: eventComment, date: eventDate, favorite: isFavorite, archive: isArchive};
         
     const collection = req.app.locals.collection;
      
@@ -81,10 +84,12 @@ app.put("/api/events", jsonParser, async(req, res)=>{
     const eventTheme = req.body.theme;
     const eventComment = req.body.comment;
     const eventDate = req.body.date;
+    const isFavorite = req.body.favorite;
+    const isArchive = req.body.archive;
         
     const collection = req.app.locals.collection;
     try{
-        const result = await collection.findOneAndUpdate({_id: id}, { $set: {date: eventDate, comment: eventComment, theme: eventTheme}},
+        const result = await collection.findOneAndUpdate({_id: id}, { $set: {archive: isArchive, favorite: isFavorite, date: eventDate, comment: eventComment, theme: eventTheme}},
          {returnDocument: "after" });
         const event = result.value;
         res.send(event);
