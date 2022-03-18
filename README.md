@@ -12,7 +12,9 @@
     {
         "theme": "string",
         "comment": "string",
-        "date": "string"
+        "date": "string",
+        "favorite": "boolean",
+        "archive": "boolean"
     }
 ```
 
@@ -30,7 +32,9 @@
         "id": "string",
         "theme": "string",
         "comment": "string",
-        "date": "string"
+        "date": "string",
+        "favorite": "boolean",
+        "archive": "boolean"
     }
 ```
 
