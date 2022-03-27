@@ -17,22 +17,23 @@ app.use(express.static(__dirname + "/public"));
         app.locals.collection = mongoClient.db("eventDatabase").collection("events");
         await app.listen(process.env.PORT || 3000);
         console.log("Server waiting...");
-    }catch(err) {
+    } catch(err) {
         return console.log(err);
     } 
 })();
- 
- 
+
 app.get("/api/events", async(req, res) => {
          
     const collection = req.app.locals.collection;
-    try{
+    try {
         const events = await collection.find({}).toArray();
         res.send(events);
     }
-    catch(err){return console.log(err);}
-      
+    catch(err) {
+        return console.log(err);
+    }     
 });
+
 app.get("/api/events/:id", async(req, res) => {
          
     const id = new objectId(req.params.id);
@@ -41,10 +42,12 @@ app.get("/api/events/:id", async(req, res) => {
         const event = await collection.findOne({_id: id});
         res.send(event);
     }
-    catch(err){return console.log(err);}
+    catch(err) {
+        return console.log(err);
+    }
 });
     
-app.post("/api/events", jsonParser, async(req, res)=> {
+app.post("/api/events", jsonParser, async(req, res) => {
         
     if(!req.body) return res.sendStatus(400);
         
@@ -54,7 +57,13 @@ app.post("/api/events", jsonParser, async(req, res)=> {
     const isFavorite = req.body.favorite;
     const isArchive = req.body.archive;
 
-    let event = {theme: eventTheme, comment: eventComment, date: eventDate, favorite: isFavorite, archive: isArchive};
+    let event = {
+        theme: eventTheme,
+        comment: eventComment,
+        date: eventDate,
+        favorite: isFavorite,
+        archive: isArchive
+    };
         
     const collection = req.app.locals.collection;
      
@@ -62,22 +71,38 @@ app.post("/api/events", jsonParser, async(req, res)=> {
         await collection.insertOne(event);
         res.send(event);
     }
-    catch(err){return console.log(err);}
+    catch(err) {
+        return console.log(err);
+    }
 });
      
-app.delete("/api/events/:id", async(req, res)=>{
+app.delete("/api/events/:id", async(req, res) => {
          
     const id = new objectId(req.params.id);
     const collection = req.app.locals.collection;
-    try{
+    try {
         const result = await collection.findOneAndDelete({_id: id});
         const event = result.value;
         res.send(event);
     }
-    catch(err){return console.log(err);}
+    catch(err) {
+        return console.log(err);
+    }
+});
+
+app.delete("/api/events/archive/delete", async(req, res) => {
+    const collection = req.app.locals.collection;
+    try {
+        const result = await collection.deleteMany({archive: true});
+        const event = result.value;
+        res.send(event);
+    }
+    catch(err) {
+        return console.log(err);
+    }
 });
     
-app.put("/api/events", jsonParser, async(req, res)=>{
+app.put("/api/events", jsonParser, async(req, res) => {
          
     if(!req.body) return res.sendStatus(400);
     const id = new objectId(req.body.id);
@@ -88,13 +113,16 @@ app.put("/api/events", jsonParser, async(req, res)=>{
     const isArchive = req.body.archive;
         
     const collection = req.app.locals.collection;
-    try{
+
+    try {
         const result = await collection.findOneAndUpdate({_id: id}, { $set: {archive: isArchive, favorite: isFavorite, date: eventDate, comment: eventComment, theme: eventTheme}},
          {returnDocument: "after" });
         const event = result.value;
         res.send(event);
     }
-    catch(err){return console.log(err);}
+    catch(err) {
+        return console.log(err);
+    }
 });
   
 // Listen for program interruption (ctrl-c)
