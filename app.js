@@ -76,6 +76,18 @@ app.delete("/api/events/:id", async(req, res)=>{
     }
     catch(err){return console.log(err);}
 });
+
+app.delete("/api/events/archive/delete", async(req, res) => {
+    const collection = req.app.locals.collection;
+    try {
+        const result = await collection.deleteMany({archive: true});
+        const event = result.value;
+        res.send(event);
+    }
+    catch(err) {
+        return console.log(err);
+    }
+});
     
 app.put("/api/events", jsonParser, async(req, res)=>{
          
