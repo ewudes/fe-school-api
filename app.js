@@ -9,8 +9,8 @@ const jsonParser = express.json();
 const mongoClient = new MongoClient(process.env.MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
  
 app.use(express.static(__dirname + "/public"));
- 
- 
+
+
 (async () => {
      try {
         await mongoClient.connect();
