@@ -1,11 +1,10 @@
-<!-- ![image](https://pyheroku-badge.herokuapp.com/?app=fe-school-api&path=https://fe-school-api.herokuapp.com&style=flat") -->
 
 ## Get all events ##
-**GET** `https://fe-school-api.herokuapp.com/api/events`
+**GET** `https://fe-school-api.onrender.com/api/events`
 ## Get one event ##
-**GET** `https://fe-school-api.herokuapp.com/api/events/:id`
+**GET** `https://fe-school-api.onrender.com/api/events/:id`
 ## Create an event ##
-**POST** `https://fe-school-api.herokuapp.com/api/events/`
+**POST** `https://fe-school-api.onrender.com/api/events/`
 <details><summary>Scheme</summary>
 
 ```json
@@ -21,10 +20,10 @@
 </details>
 
 ## Delete event ##
-**DELETE** `https://fe-school-api.herokuapp.com/api/events/:id`
+**DELETE** `https://fe-school-api.onrender.com/api/events/:id`
 
 ## Change an existing event ##
-**PUT** `https://fe-school-api.herokuapp.com/api/events/`
+**PUT** `https://fe-school-api.onrender.com/api/events/`
 <details><summary>Scheme</summary>
 
 ```json
