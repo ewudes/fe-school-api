@@ -1,11 +1,11 @@
 let _db = null;
 
 function setDb(client) {
-  _db = client.db("eventDatabase");
+  _db = client.db('eventDatabase');
 }
 
 function getDb() {
-  if (!_db) throw new Error("Database not initialized");
+  if (!_db) throw new Error('База данных не инициализирована');
   return _db;
 }
 
