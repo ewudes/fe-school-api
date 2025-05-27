@@ -1,4 +1,4 @@
-let _db = null;
+let _db;
 
 function setDb(client) {
   _db = client.db('eventDatabase');

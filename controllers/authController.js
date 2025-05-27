@@ -4,6 +4,12 @@ const { getDb } = require('../db');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
+async function getAllUsers(req, res) {
+  const db = getDb();
+  const users = await db.collection("users").find({}, { projection: { login: 1 } }).toArray();
+  res.send(users);
+}
+
 async function register(req, res) {
   const { email, password } = req.body;
   const db = getDb();
@@ -42,4 +48,4 @@ async function login(req, res) {
   res.json({ token });
 }
 
-module.exports = { register, login };
+module.exports = { register, login, getAllUsers };

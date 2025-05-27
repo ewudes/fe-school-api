@@ -68,6 +68,12 @@
         <input class="form-control" name="comment" />
       </div>
       <div class="form-group">
+        <label for="executor">Исполнитель:</label>
+        <select class="form-control" name="executor" id="executor">
+          <option value="">Выберите исполнителя</option>
+        </select>
+      </div>
+      <div class="form-group">
         <label for="date">Дата:</label>
         <input
           type="datetime-local"
@@ -135,54 +141,70 @@
         eventTable.style.display = 'table';
         logoutBlock.style.display = 'block';
         GetEvents();
+        LoadExecutors();
       }
 
-      document
-        .getElementById('loginBtn')
-        .addEventListener('click', async () => {
-          const username = document.getElementById('username').value;
-          const password = document.getElementById('password').value;
-          const res = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password }),
-          });
-          const data = await res.json();
-          if (res.ok) {
-            authToken = data.token;
-            localStorage.setItem('token', authToken);
-            document.getElementById('auth-status').textContent =
-              'Login successful!';
-            authBlock.style.display = 'none';
-            eventForm.style.display = 'block';
-            eventTable.style.display = 'table';
-            logoutBlock.style.display = 'block';
-            GetEvents();
-          } else {
-            document.getElementById('auth-status').textContent =
-              data.message || 'Login failed';
-          }
+      async function LoadExecutors() {
+        const response = await fetch('/api/users', {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json',
+            Authorization: 'Bearer ' + authToken,
+          },
         });
 
-      document
-        .getElementById('registerBtn')
-        .addEventListener('click', async () => {
-          const username = document.getElementById('username').value;
-          const password = document.getElementById('password').value;
-          const res = await fetch('/api/auth/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password }),
+        if (response.ok) {
+          const users = await response.json();
+          const select = document.getElementById('executor');
+          select.innerHTML = '<option value="">Выберите исполнителя</option>';
+          users.forEach(user => {
+            const option = document.createElement('option');
+            option.value = user.login;
+            option.textContent = user.login;
+            select.appendChild(option);
           });
-          const data = await res.json();
-          if (res.ok) {
-            document.getElementById('auth-status').textContent =
-              'Registration successful!';
-          } else {
-            document.getElementById('auth-status').textContent =
-              data.message || 'Registration failed';
-          }
+        }
+      }
+
+      document.getElementById('loginBtn').addEventListener('click', async () => {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password }),
         });
+        const data = await res.json();
+        if (res.ok) {
+          authToken = data.token;
+          localStorage.setItem('token', authToken);
+          document.getElementById('auth-status').textContent = 'Login successful!';
+          authBlock.style.display = 'none';
+          eventForm.style.display = 'block';
+          eventTable.style.display = 'table';
+          logoutBlock.style.display = 'block';
+          GetEvents();
+          LoadExecutors();
+        } else {
+          document.getElementById('auth-status').textContent = data.message || 'Login failed';
+        }
+      });
+
+      document.getElementById('registerBtn').addEventListener('click', async () => {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+          document.getElementById('auth-status').textContent = 'Registration successful!';
+        } else {
+          document.getElementById('auth-status').textContent = data.message || 'Registration failed';
+        }
+      });
 
       document.getElementById('logoutBtn').addEventListener('click', () => {
         localStorage.removeItem('token');
@@ -224,10 +246,11 @@
           form.elements['date'].value = event.date;
           form.elements['favorite'].checked = event.favorite;
           form.elements['archive'].checked = event.archive;
+          form.elements['executor'].value = event.executor || '';
         }
       }
 
-      async function CreateEvent(theme, comment, date, favorite, archive) {
+      async function CreateEvent(theme, comment, date, favorite, archive, executor) {
         const response = await fetch('/api/events', {
           method: 'POST',
           headers: {
@@ -235,7 +258,7 @@
             'Content-Type': 'application/json',
             Authorization: 'Bearer ' + authToken,
           },
-          body: JSON.stringify({ theme, comment, date, favorite, archive }),
+          body: JSON.stringify({ theme, comment, date, favorite, archive, executor }),
         });
         if (response.ok === true) {
           const event = await response.json();
@@ -244,7 +267,7 @@
         }
       }
 
-      async function EditEvent(id, theme, comment, date, favorite, archive) {
+      async function EditEvent(id, theme, comment, date, favorite, archive, executor) {
         const response = await fetch('/api/events', {
           method: 'PUT',
           headers: {
@@ -252,14 +275,12 @@
             'Content-Type': 'application/json',
             Authorization: 'Bearer ' + authToken,
           },
-          body: JSON.stringify({ id, theme, comment, date, favorite, archive }),
+          body: JSON.stringify({ id, theme, comment, date, favorite, archive, executor }),
         });
         if (response.ok === true) {
           const event = await response.json();
           reset();
-          document
-            .querySelector("tr[data-rowid='" + event._id + "']")
-            .replaceWith(row(event));
+          document.querySelector("tr[data-rowid='" + event._id + "']").replaceWith(row(event));
         }
       }
 
@@ -288,17 +309,17 @@
         tr.setAttribute('data-rowid', event._id);
 
         tr.innerHTML = `
-                <td>${event._id}</td>
-                <td>${event.theme}</td>
-                <td>${event.comment}</td>
-                <td>${event.date}</td>
-                <td>${event.favorite}</td>
-                <td>${event.archive}</td>
-                <td>
-                    <a href="#" data-id="${event._id}" class="edit-link" style="padding:15px;">Change</a>
-                    <a href="#" data-id="${event._id}" class="delete-link" style="padding:15px;color:#FF0000">Delete</a>
-                </td>
-            `;
+          <td>${event._id}</td>
+          <td>${event.theme}</td>
+          <td>${event.comment}</td>
+          <td>${event.date}</td>
+          <td>${event.favorite}</td>
+          <td>${event.archive}</td>
+          <td>
+            <a href="#" data-id="${event._id}" class="edit-link" style="padding:15px;">Change</a>
+            <a href="#" data-id="${event._id}" class="delete-link" style="padding:15px;color:#FF0000">Delete</a>
+          </td>
+        `;
 
         tr.querySelector('.edit-link').addEventListener('click', (e) => {
           e.preventDefault();
@@ -326,8 +347,10 @@
         const date = form.elements['date'].value || new Date().toISOString();
         const favorite = form.elements['favorite'].checked;
         const archive = form.elements['archive'].checked;
-        if (id == 0) CreateEvent(theme, comment, date, favorite, archive);
-        else EditEvent(id, theme, comment, date, favorite, archive);
+        const executor = form.elements['executor'].value;
+
+        if (id == 0) CreateEvent(theme, comment, date, favorite, archive, executor);
+        else EditEvent(id, theme, comment, date, favorite, archive, executor);
       });
     </script>
   </body>

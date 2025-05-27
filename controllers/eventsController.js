@@ -17,12 +17,15 @@ async function getEventById(req, res) {
 }
 
 async function createEvent(req, res) {
-  const db = getDb();
-  const collection = db.collection('events');
-  const { theme, comment, date, favorite, archive } = req.body;
-  const event = { theme, comment, date, favorite, archive };
-  await collection.insertOne(event);
-  res.send(event);
+  try {
+    const db = getDb();
+    const collection = db.collection('events');
+    await collection.insertOne(req.body);
+    res.status(201).json({ message: 'Событие создано' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Не удалось создать событие' });
+  }
 }
 
 async function updateEvent(req, res) {

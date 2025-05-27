@@ -11,6 +11,7 @@ app.use(express.json());
 
 const authRoutes = require('./routes/auth');
 const eventRoutes = require('./routes/events');
+const userRoutes = require("./routes/users");
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -27,6 +28,7 @@ const client = new MongoClient(process.env.MONGO_URL, {
 
     app.use('/api/auth', authRoutes);
     app.use('/api/events', eventRoutes);
+    app.use("/api/users", userRoutes);
 
     app.get('/', (req, res) => {
       res.sendFile(path.join(__dirname, 'public', 'index.html'));
