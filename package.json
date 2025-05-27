@@ -1,27 +1,28 @@
 {
-  "name": "fe-school-api",
+  "name": "zenktra-api",
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
-    "vercel-build": "npm run start"
+    "start": "node app.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ewudes/fe-school-api.git"
+    "url": "git+https://github.com/ewudes/zenktra-api.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/ewudes/fe-school-api/issues"
+    "url": "https://github.com/ewudes/zenktra-api/issues"
   },
-  "homepage": "https://github.com/ewudes/fe-school-api#readme",
+  "homepage": "https://github.com/ewudes/zenktra-api#readme",
   "dependencies": {
+    "bcryptjs": "^3.0.2",
     "body-parser": "^1.19.2",
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
+    "jsonwebtoken": "^9.0.2",
     "mongodb": "^4.4.0"
   },
   "engines": {
