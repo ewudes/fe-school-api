@@ -27,11 +27,29 @@
         .form-label__checkbox {
             vertical-align: top;
         }
-
     </style>
 </head>
 <body>
-    <form name="eventForm" class="event-form">
+    <!-- Авторизация -->
+    <div id="auth-block" class="event-form">
+        <h3>Login / Register</h3>
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input class="form-control" id="username" />
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" class="form-control" id="password" />
+        </div>
+        <div class="panel-body">
+            <button id="loginBtn" class="btn btn-sm btn-success">Login</button>
+            <button id="registerBtn" class="btn btn-sm btn-info">Register</button>
+        </div>
+        <div id="auth-status" style="margin-top:10px;"></div>
+    </div>
+
+    <!-- Форма событий -->
+    <form name="eventForm" id="eventForm" class="event-form" style="display: none;">
         <input type="hidden" name="id" value="0" />
         <div class="form-group">
             <label for="theme">Theme:</label>
@@ -58,36 +76,106 @@
             <a id="reset" class="btn btn-sm btn-primary">Reset</a>
         </div>
     </form>
-    <table class="table table-condensed table-striped table-bordered">
+
+    <!-- Таблица событий -->
+    <table class="table table-condensed table-striped table-bordered" style="display: none;">
         <thead><tr><th>Id</th><th>Theme</th><th>Comment</th><th>Date</th><th>F</th><th>A</th><th></th></tr></thead>
-        <tbody>
-        </tbody>
+        <tbody></tbody>
     </table>
-   
+
+    <!-- Кнопка выхода -->
+    <div class="event-form" style="display: none;" id="logout-block">
+        <button id="logoutBtn" class="btn btn-sm btn-danger">Logout</button>
+    </div>
+
+    <!-- Скрипт -->
     <script>
-    // Getting all the events
+        let authToken = localStorage.getItem("token") || "";
+
+        const authBlock = document.getElementById("auth-block");
+        const eventForm = document.getElementById("eventForm");
+        const eventTable = document.querySelector("table");
+        const logoutBlock = document.getElementById("logout-block");
+
+        if (!authToken) {
+            authBlock.style.display = "block";
+        } else {
+            authBlock.style.display = "none";
+            eventForm.style.display = "block";
+            eventTable.style.display = "table";
+            logoutBlock.style.display = "block";
+            GetEvents();
+        }
+
+        document.getElementById("loginBtn").addEventListener("click", async () => {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const res = await fetch("/api/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                authToken = data.token;
+                localStorage.setItem("token", authToken);
+                document.getElementById("auth-status").textContent = "Login successful!";
+                authBlock.style.display = "none";
+                eventForm.style.display = "block";
+                eventTable.style.display = "table";
+                logoutBlock.style.display = "block";
+                GetEvents();
+            } else {
+                document.getElementById("auth-status").textContent = data.message || "Login failed";
+            }
+        });
+
+        document.getElementById("registerBtn").addEventListener("click", async () => {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const res = await fetch("/api/auth/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                document.getElementById("auth-status").textContent = "Registration successful!";
+            } else {
+                document.getElementById("auth-status").textContent = data.message || "Registration failed";
+            }
+        });
+
+        document.getElementById("logoutBtn").addEventListener("click", () => {
+            localStorage.removeItem("token");
+            location.reload();
+        });
+
         async function GetEvents() {
-            // Send a request and get an answer
             const response = await fetch("/api/events", {
                 method: "GET",
-                headers: { "Accept": "application/json" }
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": "Bearer " + authToken
+                }
             });
-            // If the request was sent normally
             if (response.ok === true) {
-                // Receiving data
                 const events = await response.json();
-                let rows = document.querySelector("tbody"); 
+                let rows = document.querySelector("tbody");
+                rows.innerHTML = "";
                 events.forEach(event => {
-                    // Add these elements to the table
                     rows.append(row(event));
                 });
             }
         }
-        // Get one event
+
         async function GetEvent(id) {
             const response = await fetch("/api/events/" + id, {
                 method: "GET",
-                headers: { "Accept": "application/json" }
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": "Bearer " + authToken
+                }
             });
             if (response.ok === true) {
                 const event = await response.json();
@@ -99,21 +187,17 @@
                 form.elements["favorite"].checked = event.favorite;
                 form.elements["archive"].checked = event.archive;
             }
-
         }
-        // Creating an event
-        async function CreateEvent(eventTheme, eventComment, eventDate, isFavorite, isArchive) {
-  
-            const response = await fetch("api/events", {
+
+        async function CreateEvent(theme, comment, date, favorite, archive) {
+            const response = await fetch("/api/events", {
                 method: "POST",
-                headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    theme: eventTheme,
-                    comment: eventComment,
-                    date: eventDate,
-                    favorite: isFavorite,
-                    archive: isArchive
-                })
+                headers: {
+                    "Accept": "application/json",
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + authToken
+                },
+                body: JSON.stringify({ theme, comment, date, favorite, archive })
             });
             if (response.ok === true) {
                 const event = await response.json();
@@ -121,19 +205,16 @@
                 document.querySelector("tbody").append(row(event));
             }
         }
-        // Changing the event
-        async function EditEvent(eventId, eventTheme, eventComment, eventDate, isFavorite, isArchive) {
-            const response = await fetch("api/events", {
+
+        async function EditEvent(id, theme, comment, date, favorite, archive) {
+            const response = await fetch("/api/events", {
                 method: "PUT",
-                headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    id: eventId,
-                    theme: eventTheme,
-                    comment: eventComment,
-                    date: eventDate,
-                    favorite: isFavorite,
-                    archive: isArchive
-                })
+                headers: {
+                    "Accept": "application/json",
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + authToken
+                },
+                body: JSON.stringify({ id, theme, comment, date, favorite, archive })
             });
             if (response.ok === true) {
                 const event = await response.json();
@@ -141,97 +222,68 @@
                 document.querySelector("tr[data-rowid='" + event._id + "']").replaceWith(row(event));
             }
         }
-        // Deleting an event
+
         async function DeleteEvent(id) {
             const response = await fetch("/api/events/" + id, {
                 method: "DELETE",
-                headers: { "Accept": "application/json" }
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": "Bearer " + authToken
+                }
             });
             if (response.ok === true) {
                 const event = await response.json();
                 document.querySelector("tr[data-rowid='" + event._id + "']").remove();
             }
         }
-  
-        // Reset form
+
         function reset() {
             const form = document.forms["eventForm"];
             form.reset();
             form.elements["id"].value = 0;
         }
-        // Creating a row for a table
+
         function row(event) {
-  
             const tr = document.createElement("tr");
             tr.setAttribute("data-rowid", event._id);
-  
-            const idTd = document.createElement("td");
-            idTd.append(event._id);
-            tr.append(idTd);
-  
-            const themeTd = document.createElement("td");
-            themeTd.append(event.theme);
-            tr.append(themeTd);
-  
-            const commentTd = document.createElement("td");
-            commentTd.append(event.comment);
-            tr.append(commentTd);
 
-            const dateTd = document.createElement("td");
-            dateTd.append(event.date);
-            tr.append(dateTd);
+            tr.innerHTML = `
+                <td>${event._id}</td>
+                <td>${event.theme}</td>
+                <td>${event.comment}</td>
+                <td>${event.date}</td>
+                <td>${event.favorite}</td>
+                <td>${event.archive}</td>
+                <td>
+                    <a href="#" data-id="${event._id}" class="edit-link" style="padding:15px;">Change</a>
+                    <a href="#" data-id="${event._id}" class="delete-link" style="padding:15px;color:#FF0000">Delete</a>
+                </td>
+            `;
 
-            const favoriteTd = document.createElement("td");
-            favoriteTd.append(event.favorite);
-            tr.append(favoriteTd);
-
-            const archiveTd = document.createElement("td");
-            archiveTd.append(event.archive);
-            tr.append(archiveTd);
-              
-            const linksTd = document.createElement("td");
-  
-            const editLink = document.createElement("a");
-            editLink.setAttribute("data-id", event._id);
-            editLink.setAttribute("style", "cursor:pointer;padding:15px;");
-            editLink.append("Change");
-            editLink.addEventListener("click", e => {
-  
+            tr.querySelector(".edit-link").addEventListener("click", e => {
                 e.preventDefault();
                 GetEvent(event._id);
             });
-            linksTd.append(editLink);
-  
-            const removeLink = document.createElement("a");
-            removeLink.setAttribute("data-id", event._id);
-            removeLink.setAttribute("style", "cursor:pointer;padding:15px;color:#FF0000");
-            removeLink.append("Delete");
-            removeLink.addEventListener("click", e => {
-  
+            tr.querySelector(".delete-link").addEventListener("click", e => {
                 e.preventDefault();
                 DeleteEvent(event._id);
             });
-  
-            linksTd.append(removeLink);
-            tr.appendChild(linksTd);
-  
+
             return tr;
         }
-        // Reset form values
-        document.getElementById("reset").click(function (e) {
-  
+
+        document.getElementById("reset").addEventListener("click", e => {
             e.preventDefault();
             reset();
-        })
-  
-        // Sending the form
+        });
+
         document.forms["eventForm"].addEventListener("submit", e => {
             e.preventDefault();
             const form = document.forms["eventForm"];
             const id = form.elements["id"].value;
             const theme = form.elements["theme"].value;
             const comment = form.elements["comment"].value;
-            const date = form.elements["date"].value ? new Date(form.elements["date"].value) : new Date();
+            const date = form.elements["date"].value || new Date().toISOString();
             const favorite = form.elements["favorite"].checked;
             const archive = form.elements["archive"].checked;
             if (id == 0)
@@ -239,9 +291,6 @@
             else
                 EditEvent(id, theme, comment, date, favorite, archive);
         });
-  
-        // Loading events
-        GetEvents();
     </script>
 </body>
 </html>
